@@ -1,6 +1,6 @@
 {
   "name": "phantomjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "keywords": [
     "phantomjs",
     "phantomjs2",
@@ -12,10 +12,10 @@
     "webkit"
   ],
   "description": "Headless WebKit with JS API",
-  "homepage": "https://github.com/laughingMan/phantomjs2.0",
+  "homepage": "https://github.com/grnadav/phantomjs2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/laughingMan/phantomjs2.0.git"
+    "url": "git://github.com/grnadav/phantomjs2.0.git"
   },
   "licenses": [
     {
@@ -34,10 +34,10 @@
   },
   "dependencies": {
     "adm-zip": "0.4.4",
-    "kew": "0.4.0",
-    "ncp": "~1.0.1",
-    "npmconf": "2.0.9",
+    "kew": "0.7.0",
     "mkdirp": "0.5.0",
+    "ncp": "~2.0.0",
+    "npmconf": "^2.1.2",
     "progress": "1.1.8",
     "request": "2.42.0",
     "request-progress": "0.3.1",
@@ -48,7 +48,7 @@
     "nodeunit": "0.9.0"
   },
   "bugs": {
-    "url": "https://github.com/laughingMan/phantomjs2.0/issues"
+    "url": "https://github.com/grnadav/phantomjs2.0/issues"
   },
   "directories": {
     "test": "test"
