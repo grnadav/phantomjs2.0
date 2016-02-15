@@ -6,12 +6,14 @@
 
 'use strict'
 
+// TODO add option for windows
+
 var requestProgress = require('request-progress')
 var progress = require('progress')
 var AdmZip = require('adm-zip')
 var cp = require('child_process')
 var fs = require('fs')
-var helper = require('./lib/phantomjs')
+//var helper = require('./lib/phantomjs')
 var kew = require('kew')
 var mkdirp = require('mkdirp')
 var ncp = require('ncp')
@@ -20,11 +22,11 @@ var path = require('path')
 var request = require('request')
 var rimraf = require('rimraf')
 var url = require('url')
-var util = require('util')
 var which = require('which')
+var phantomVersion = '2.1.1'
 
-var cdnUrl = process.env.PHANTOMJS_CDNURL || 'https://github.com/laughingMan/phantomjs2.0/releases/download/'
-var downloadUrl = cdnUrl + helper.version + '/phantomjs-' + helper.version + '-'
+var cdnUrl = process.env.npm_package_config_PHANTOMJS_CDNURL || process.env.PHANTOMJS_CDNURL || 'https://bitbucket.org/ariya/phantomjs/downloads/'
+var downloadUrl = cdnUrl + 'phantomjs-' + phantomVersion + '-'
 
 var originalPath = process.env.PATH
 
@@ -41,7 +43,7 @@ process.on('exit', function () {
 // NPM adds bin directories to the path, which will cause `which` to find the
 // bin for this package not the actual phantomjs bin.  Also help out people who
 // put ./bin on their path
-process.env.PATH = helper.cleanPath(originalPath)
+//process.env.PATH = helper.cleanPath(originalPath)
 
 var libPath = path.join(__dirname, 'lib')
 var pkgPath = path.join(libPath, 'phantom')
@@ -84,7 +86,7 @@ whichDeferred.promise
   })
   .then(function (stdout) {
     var version = stdout.trim()
-    if (helper.version == version) {
+    if (phantomVersion == version) {
       writeLocationFile(phantomPath);
       console.log('PhantomJS is already installed at', phantomPath + '.')
       exit(0)
@@ -105,29 +107,8 @@ whichDeferred.promise
     var deferred = kew.defer()
 
     // Can't use a global version so start a download.
-    if (fs.existsSync("/usr/bin/lsb_release")) {
-      cp.exec("lsb_release -d | awk -F'\t' '{print $2}'", function(error, stdout, stderr) {
-        if (stdout) {
-          if (stdout.indexOf("Ubuntu 14") >= 0) {
-            downloadUrl += 'u1404-x86_64.zip'
-            deferred.resolve(conf)
-          } else if (stdout.indexOf("Ubuntu 15") >= 0) {
-            downloadUrl += 'u1504-x86_64.zip'
-            deferred.resolve(conf)
-          }
-        }
-      });
-      return deferred.promise
-    } else if (fs.existsSync("/etc/os-release")) {
-      cp.exec("gawk -F= '/^NAME/{print $2}' /etc/os-release", function(error, stdout, stderr) {
-        if (stdout && stdout.indexOf("CentOS") != -1) {
-            downloadUrl += 'centos7-x86_64.zip'
-            deferred.resolve(conf)
-        }
-      });
-      return deferred.promise
-    } else if (process.platform === 'linux' && process.arch === 'x64') {
-      downloadUrl += 'linux-x86_64.zip'
+    if (process.platform === 'linux' && process.arch === 'x64') {
+      downloadUrl += 'linux-x86_64.tar.bz2'
     } else if (process.platform === 'darwin' || process.platform === 'openbsd' || process.platform === 'freebsd') {
       downloadUrl += 'macosx.zip'
       return conf
@@ -258,10 +239,7 @@ function getRequestOptions(conf) {
 function requestBinary(requestOptions, filePath) {
   var deferred = kew.defer()
 
-  var count = 0
-  var notifiedCount = 0
   var writePath = filePath + '-download-' + Date.now()
-  var outFile = fs.openSync(writePath, 'w')
 
   console.log('Receiving...')
   var bar = null
@@ -352,7 +330,7 @@ function copyIntoPlace(extractedPath, targetPath) {
     var files = fs.readdirSync(extractedPath)
     for (var i = 0; i < files.length; i++) {
       var file = path.join(extractedPath, files[i])
-      if (fs.statSync(file).isDirectory() && file.indexOf(helper.version) != -1) {
+      if (fs.statSync(file).isDirectory() && file.indexOf(phantomVersion) != -1) {
         console.log('Copying extracted folder', file, '->', targetPath)
         return kew.nfcall(ncp, file, targetPath)
       }
